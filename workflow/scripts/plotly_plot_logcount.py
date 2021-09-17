@@ -25,9 +25,7 @@ def main(snakemake):
     )
     meta = pd.read_csv(snakemake.input.meta, sep="\t").set_index("sample")
     primary_var = snakemake.params.primary_variable
-    counts[primary_var] = counts["variable"].apply(
-        lambda s: meta.loc[s][primary_var]
-    )
+    counts[primary_var] = counts["variable"].apply(lambda s: meta.loc[s][primary_var])
     counts["gene"].fillna(
         counts["transcript"].str.split(".", n=1, expand=True)[0], inplace=True
     )
@@ -41,6 +39,8 @@ def main(snakemake):
             color="transcript",
             points="all",
             title=gene,
+            hover_name="variable",
+            hover_data=["transcript", "condition", "logcount"],
             template="plotly_white",
         )
         fig.write_html(os.path.join(snakemake.output.plots, f"{gene}.html"))
