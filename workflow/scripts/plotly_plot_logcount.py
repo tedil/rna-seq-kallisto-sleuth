@@ -13,9 +13,12 @@ def main(snakemake):
 
     counts = pd.read_csv(snakemake.input.logcounts, sep="\t")
     counts = counts.set_index("gene")
-    counts = counts.loc[
-        set(counts.index) & (diffexp_genes | genes_of_interest)
-    ].reset_index()
+    counts = (
+        counts.loc[set(counts.index) & (diffexp_genes | genes_of_interest)]
+        .reset_index()
+        .set_index(["transcript", "gene"])
+        .reset_index()
+    )
 
     id_vars = ["transcript", "gene"]
     value_vars = list(counts.columns[2:])
