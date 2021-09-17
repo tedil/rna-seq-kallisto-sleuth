@@ -258,7 +258,7 @@ def all_input(wildcards):
 
     wanted_input.extend(
         expand(
-            "results/plots/interactive/logcount/{model}.html",
+            "results/plots/interactive/logcount/{model}/",
             model=config["diffexp"]["models"],
         )
     )

@@ -372,8 +372,10 @@ rule logcount_plots:
         diffexp="results/tables/diffexp/{model}.transcripts.diffexp.tsv",
         meta="results/sleuth/samples.tsv",
     output:
-        html=report(
-            "results/plots/interactive/logcount/{model}.html", category="Plots"
+        plots=report(
+            directory("results/plots/interactive/logcount/{model}"),
+            category="Plots",
+            patterns=["{gene}.html"],
         ),
     params:
         model=get_model,

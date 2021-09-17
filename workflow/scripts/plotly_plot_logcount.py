@@ -39,7 +39,7 @@ def main(snakemake):
             title=gene,
             template="plotly_white",
         )
-        fig.write_image(os.path.join(snakemake.output.plots, f"{gene}.pdf"))
+        fig.write_html(os.path.join(snakemake.output.plots, f"{gene}.html"))
 
 
 if __name__ == "__main__":
