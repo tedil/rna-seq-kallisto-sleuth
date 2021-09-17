@@ -24,8 +24,9 @@ def main(snakemake):
         counts, id_vars=id_vars, value_vars=value_vars, value_name="logcount"
     )
     meta = pd.read_csv(snakemake.input.meta, sep="\t").set_index("sample")
-    counts["condition"] = counts["variable"].apply(
-        lambda s: meta.loc[s][snakemake.params.primary_variable]
+    primary_var = snakemake.params.primary_variable
+    counts[primary_var] = counts["variable"].apply(
+        lambda s: meta.loc[s][primary_var]
     )
     counts["gene"].fillna(
         counts["transcript"].str.split(".", n=1, expand=True)[0], inplace=True
@@ -36,7 +37,7 @@ def main(snakemake):
     for gene, group in counts.groupby("gene"):
         fig = px.box(
             group,
-            x="condition",
+            x=primary_var,
             y="logcount",
             color="transcript",
             points="all",
