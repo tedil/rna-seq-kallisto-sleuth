@@ -11,6 +11,10 @@ def main(snakemake):
         diffexp.query(f"qval < {snakemake.params.sig_level}")["ext_gene"]
     )
 
+    diffexp_genes = diffexp_genes.sort_values(by=["qval"]).iloc[
+        0 : snakemake.params.max_plots
+    ]
+
     counts = pd.read_csv(snakemake.input.logcounts, sep="\t")
     counts = counts.set_index("gene")
     counts = counts.loc[
@@ -40,7 +44,7 @@ def main(snakemake):
             points="all",
             title=gene,
             hover_name="variable",
-            hover_data=["transcript", "condition", "logcount"],
+            hover_data=["transcript", "logcount", primary_var],
             template="plotly_white",
         )
         fig.write_html(os.path.join(snakemake.output.plots, f"{gene}.html"))

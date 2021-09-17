@@ -46,6 +46,8 @@ diffexp:
     ma-plot: 0.05
     qq-plot: 0.05
     logcount-plot: 0.05
+  max-plots:
+    logcount-plot: 100
 
 enrichment:
   goatools:

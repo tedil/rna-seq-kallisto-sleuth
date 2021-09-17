@@ -384,6 +384,7 @@ rule logcount_plots:
         primary_variable=lambda wc: config["diffexp"]["models"][wc.model][
             "primary_variable"
         ],
+        max_plots=config["diffexp"]["max-plots"]["logcount-plot"],
     log:
         "logs/plotly-plots/logcount/{model}.log",
     conda:
