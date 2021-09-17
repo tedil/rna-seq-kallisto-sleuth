@@ -370,6 +370,7 @@ rule logcount_plots:
     input:
         logcounts="results/tables/logcount-matrix/{model}.logcount-matrix.tsv",
         diffexp="results/tables/diffexp/{model}.transcripts.diffexp.tsv",
+        meta="results/sleuth/samples.tsv",
     output:
         html=report(
             "results/plots/interactive/logcount/{model}.html", category="Plots"
@@ -378,6 +379,9 @@ rule logcount_plots:
         model=get_model,
         sig_level=config["diffexp"]["sig-level"]["logcount-plot"],
         genes_of_interest=config["bootstrap_plots"]["genes_of_interest"],
+        primary_variable=lambda wc: config["diffexp"]["models"][wc.model][
+            "primary_variable"
+        ],
     log:
         "logs/plotly-plots/logcount/{model}.log",
     conda:

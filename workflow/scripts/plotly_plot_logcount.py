@@ -24,7 +24,9 @@ def main(snakemake):
         counts, id_vars=id_vars, value_vars=value_vars, value_name="logcount"
     )
     meta = pd.read_csv(snakemake.input.meta, sep="\t").set_index("sample")
-    counts["condition"] = counts["variable"].apply(lambda s: meta.loc[s]["condition"])
+    counts["condition"] = counts["variable"].apply(
+        lambda s: meta.loc[s][snakemake.params.primary_variable]
+    )
 
     os.makedirs(snakemake.output.plots)
     for gene, group in counts.groupby("gene"):
