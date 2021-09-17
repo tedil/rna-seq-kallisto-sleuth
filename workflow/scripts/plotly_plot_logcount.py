@@ -8,9 +8,7 @@ def main(snakemake):
 
     diffexp = pd.read_csv(snakemake.input.diffexp, sep="\t")
     diffexp_genes = diffexp.query(f"qval < {snakemake.params.sig_level}")
-    diffexp_genes["ext_gene"].fillna(
-        diffexp_genes["transcript"].str.split(".", n=1, expand=True)[0], inplace=True
-    )
+    diffexp_genes["ext_gene"].fillna(diffexp_genes["ens_gene"], inplace=True)
     diffexp_genes = diffexp_genes.sort_values(by=["qval"]).iloc[
         0 : snakemake.params.max_plots
     ]
