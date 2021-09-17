@@ -362,3 +362,21 @@ rule vega_volcano_plot:
         "../envs/vega.yaml"
     script:
         "../scripts/vega_plot_volcano.py"
+
+
+rule logcount_plots:
+    input:
+        logcounts="results/tables/logcount-matrix/{model}.logcount-matrix.tsv",
+        diffexp="results/tables/diffexp/{model}.transcripts.diffexp.tsv",
+    output:
+        html=report("results/plots/interactive/logcount/{model}.html", category="Plots"),
+    params:
+        model=get_model,
+        sig_level=config["diffexp"]["sig-level"]["logcount-plot"],
+        genes_of_interest=config["bootstrap_plots"]["genes_of_interest"],
+    log:
+        "logs/plotly-plots/logcount/{model}.log"
+    conda:
+        "../envs/plotly.yaml"
+    script:
+        "../scripts/plotly_plot_logcount.py"
