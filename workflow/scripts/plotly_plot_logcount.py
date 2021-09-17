@@ -31,7 +31,6 @@ def main(snakemake):
     counts["gene"].fillna(
         counts["transcript"].str.split(".", n=1, expand=True)[0], inplace=True
     )
-    print(counts)
 
     os.makedirs(snakemake.output.plots)
     for gene, group in counts.groupby("gene"):
