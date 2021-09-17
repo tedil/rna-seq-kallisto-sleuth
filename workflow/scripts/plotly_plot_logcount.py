@@ -27,7 +27,9 @@ def main(snakemake):
     counts["condition"] = counts["variable"].apply(
         lambda s: meta.loc[s][snakemake.params.primary_variable]
     )
-    counts["gene"].fillna(counts["transcript"].str.split('.')[0], inplace=True)
+    counts["gene"].fillna(
+        counts["transcript"].str.split(".", n=1, expand=True)[0], inplace=True
+    )
     print(counts)
 
     os.makedirs(snakemake.output.plots)
