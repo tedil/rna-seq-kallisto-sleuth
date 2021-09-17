@@ -7,13 +7,11 @@ def main(snakemake):
     genes_of_interest = set(snakemake.params.genes_of_interest)
 
     diffexp = pd.read_csv(snakemake.input.diffexp, sep="\t")
-    diffexp_genes = set(
-        diffexp.query(f"qval < {snakemake.params.sig_level}")["ext_gene"]
-    )
-
+    diffexp_genes = diffexp.query(f"qval < {snakemake.params.sig_level}")
     diffexp_genes = diffexp_genes.sort_values(by=["qval"]).iloc[
         0 : snakemake.params.max_plots
     ]
+    diffexp_genes = set(diffexp_genes["ext_gene"])
 
     counts = pd.read_csv(snakemake.input.logcounts, sep="\t")
     counts = counts.set_index("gene")
