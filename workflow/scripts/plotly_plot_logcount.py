@@ -19,7 +19,6 @@ def main(snakemake):
     counts = counts.loc[
         set(counts.index) & (diffexp_genes | genes_of_interest)
     ].reset_index()
-    print(counts)
 
     value_vars = list(counts.columns[2:])
     id_vars = ["transcript", "gene"]
