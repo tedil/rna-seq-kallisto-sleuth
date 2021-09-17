@@ -256,4 +256,11 @@ def all_input(wildcards):
         )
     )
 
+    wanted_input.extend(
+        expand(
+            "results/plots/interactive/logcount/{model}.html",
+            model=config["diffexp"]["models"],
+        )
+    )
+
     return wanted_input
