@@ -17,7 +17,7 @@
             "height": 80,
             "encoding": {
                 "x": {
-                    "bin": true,
+                    "bin": {"step": 0.125},
                     "field": "$beta_column",
                     "axis": null
                 },
@@ -145,7 +145,7 @@
                             "as": "log_qval"
                         },
                         {
-                            "bin": true,
+                            "bin": {"step": 0.1},
                             "field": "log_qval",
                             "as": "bin_log_qval"
                         },
