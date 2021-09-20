@@ -7,6 +7,7 @@
             "type": "tsv"
         }
     },
+    "title": "$plot_title",
     "spacing": 15,
     "bounds": "flush",
     "vconcat": [
@@ -42,7 +43,8 @@
                             "encoding": {
                                 "x": {
                                     "field": "$beta_column",
-                                    "type": "quantitative"
+                                    "type": "quantitative",
+                                    "title": "$x_axis_label"
                                 },
                                 "y": {
                                     "field": "qval",

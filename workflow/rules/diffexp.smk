@@ -347,6 +347,7 @@ rule vega_volcano_plot:
     input:
         tsv="results/tables/diffexp/{model}.transcripts.diffexp.tsv",
         spec=workflow.source_path("../../resources/vega_volcano_plot.json"),
+        meta="results/sleuth/samples.tsv",
     output:
         json="results/plots/interactive/volcano/{model}.vl.json",
         html=report(
