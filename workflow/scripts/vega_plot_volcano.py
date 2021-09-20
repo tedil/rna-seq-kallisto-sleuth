@@ -36,7 +36,7 @@ def main(snakemake):
     model = snakemake.params.model
 
     meta = pd.read_csv(snakemake.input.meta, sep="\t")
-    covariates = sorted(set(map(str, meta[primary_var])))
+    characteristics = sorted(set(map(str, meta[primary_var])))
 
     # find column that matches primary variable
     df: pd.DataFrame = pd.read_csv(snakemake.input.tsv, sep="\t")
@@ -61,8 +61,8 @@ def main(snakemake):
     data = StringIO()
     df.to_csv(data, sep="\t", index=False)
 
-    if len(covariates) == 2:
-        x_axis_label = f"beta values of {covariates[1]} vs {covariates[0]} (~log2({covariates[1]}/{covariates[0]}))"
+    if len(characteristics) == 2:
+        x_axis_label = f"beta values of {characteristics[1]} vs {characteristics[0]} (~log2({characteristics[1]}/{characteristics[0]}))"
     else:
         x_axis_label = f"{beta_col}"
 
@@ -73,7 +73,7 @@ def main(snakemake):
         sig_level=sig_level,
         beta_column=beta_col,
         beta_se_column=beta_col + "_se",
-        plot_title=f"beta values vs qval for model {model['full']}, covariates: {covariates}",
+        plot_title=f"beta values vs qval for model {model['full']}, characteristics: {characteristics}",
     )
 
     html = Template(HTML).safe_substitute(json=json)
