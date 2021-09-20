@@ -36,7 +36,7 @@ def main(snakemake):
     model = snakemake.params.model
 
     meta = pd.read_csv(snakemake.input.meta, sep="\t")
-    covariates = sorted(set(meta[primary_var]))
+    covariates = sorted(set(map(str, meta[primary_var])))
 
     # find column that matches primary variable
     df: pd.DataFrame = pd.read_csv(snakemake.input.tsv, sep="\t")
