@@ -1,0 +1,3 @@
+Transcript expression as normalized and batch-corrected log counts, stratified by transcript and primary variable in the model.
+Expressions are normalized and corrected for batch effects with the model ``{{ snakemake.params.model["reduced"] }}``, while protecting the model ``{{ snakemake.params.model["nobatch"] }}``, using Limma.
+Tooltips on individual points have additional information, such as sample names.

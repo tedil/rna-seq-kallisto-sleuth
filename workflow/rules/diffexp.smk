@@ -352,6 +352,7 @@ rule vega_volcano_plot:
         json="results/plots/interactive/volcano/{model}.vl.json",
         html=report(
             "results/plots/interactive/volcano/{model}.html",
+            caption="../report/interactive-plot-volcano.rst",
             category="Volcano Plots",
             subcategory="{model}",
         ),
@@ -378,6 +379,7 @@ rule logcount_plots:
         plots=report(
             directory("results/plots/interactive/logcount/{model}"),
             category="Logcount Plots",
+            caption="../report/interactive-plot-logcount.rst",
             subcategory="{model}",
             patterns=["{gene}.html"],
         ),
