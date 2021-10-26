@@ -411,6 +411,9 @@ rule plot_dendrograms:
     output:
         plots=report(
             directory("results/plots/interactive/dendrograms/{model}/{signature}/"),
+            category="Dendrograms",
+            subcategory="{model}",
+            caption="../report/interactive-plot-dendrogram.rst",
             patterns=["{gene_set}.html"],
         ),
     params:

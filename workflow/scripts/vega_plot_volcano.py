@@ -38,6 +38,7 @@ def main(snakemake):
     meta = pd.read_csv(snakemake.input.meta, sep="\t")
     characteristics = sorted(set(map(str, meta[primary_var])))
 
+    # TODO: use base_level from config
     # find column that matches primary variable
     df: pd.DataFrame = pd.read_csv(snakemake.input.tsv, sep="\t")
 
