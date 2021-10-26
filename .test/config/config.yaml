@@ -52,6 +52,9 @@ diffexp:
   max-plots:
     logcount-plot: 100
 
+signatures:
+  dummy: "ngs-test-data/ref/dummy.gmt"
+
 diffsplice:
   # codingCutoff parameter of isoformSwitchAnalyzer, see
   # https://rdrr.io/bioc/IsoformSwitchAnalyzeR/man/analyzeCPAT.html

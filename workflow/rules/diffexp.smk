@@ -399,3 +399,25 @@ rule logcount_plots:
         "../envs/plotly.yaml"
     script:
         "../scripts/plotly_plot_logcount.py"
+
+
+rule plot_dendrograms:
+    input:
+        signature=lambda wc: config["signatures"][wc.signature],
+        logcounts="results/tables/logcount-matrix/{model}.logcount-matrix.tsv",
+    output:
+        plots=report(
+            directory("results/plots/interactive/dendrograms/{model}/{signature}/"),
+            patterns=["{gene_set}.html"],
+        ),
+    params:
+        linkage="ward",  # linkage function to use for hierarchical clustering, see scikit-learn
+        metric="euclidean",  # metric to use for hierarchical clustering, see scikit-learn
+        normalize=False,  # scale and/or normalize before applying hierarchical clustering
+        aggregate_counts="mean",  # aggregate transcripts to gene level using either of: min, max, mean, median or None for keeping transcripts
+    log:
+        "logs/plotly-plots/dendrograms/{model}/{signature}.log",
+    conda:
+        "../envs/plotly.yaml"
+    script:
+        "../scripts/plot-dendrograms.py"

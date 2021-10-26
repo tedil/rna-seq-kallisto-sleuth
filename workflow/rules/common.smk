@@ -274,4 +274,12 @@ def all_input(wildcards):
         )
     )
 
+    wanted_input.extend(
+        expand(
+            "results/plots/interactive/dendrograms/{model}/{signature}",
+            model=config["diffexp"]["models"],
+            signature=config["signatures"],
+        )
+    )
+
     return wanted_input
