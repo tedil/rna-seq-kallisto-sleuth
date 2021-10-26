@@ -72,8 +72,8 @@ rule sleuth_diffexp:
         genes_aggregated_rds=(
             "results/sleuth/diffexp/{model}.genes-aggregated.diffexp.rds"
         ),
-        genes_mostsigtrans_rds=(
-            "results/sleuth/diffexp/{model}.genes-mostsigtrans.diffexp.rds"
+        genes_representative_rds=(
+            "results/sleuth/diffexp/{model}.genes-representative.diffexp.rds"
         ),
         transcripts=report(
             "results/tables/diffexp/{model}.transcripts.diffexp.tsv",
@@ -85,9 +85,9 @@ rule sleuth_diffexp:
             caption="../report/diffexp-genes.rst",
             category="Differential gene expression",
         ),
-        genes_mostsigtrans=report(
-            "results/tables/diffexp/{model}.genes-mostsigtrans.diffexp.tsv",
-            caption="../report/diffexp-mostsigtrans.rst",
+        genes_representative=report(
+            "results/tables/diffexp/{model}.genes-representative.diffexp.tsv",
+            caption="../report/diffexp-representative.rst",
             category="Differential gene expression",
         ),
     params:
@@ -95,6 +95,9 @@ rule sleuth_diffexp:
         sig_level_volcano=config["diffexp"]["sig-level"]["volcano-plot"],
         sig_level_ma=config["diffexp"]["sig-level"]["ma-plot"],
         sig_level_qq=config["diffexp"]["sig-level"]["qq-plot"],
+        representative_transcripts=config["resources"]["ref"][
+            "representative_transcripts"
+        ],
     conda:
         "../envs/sleuth.yaml"
     log:
