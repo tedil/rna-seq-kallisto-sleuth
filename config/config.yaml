@@ -67,6 +67,7 @@ signatures:
 
 
 diffsplice:
+  activate: true
   # codingCutoff parameter of isoformSwitchAnalyzer, see
   # https://rdrr.io/bioc/IsoformSwitchAnalyzeR/man/analyzeCPAT.html
   coding_cutoff: 0.725

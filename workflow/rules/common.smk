@@ -257,14 +257,15 @@ def all_input(wildcards):
         )
     )
 
-    # diffsplice analysis
-    wanted_input.extend(
-        expand(
-            "results/plots/diffsplice/{model}/{cons}",
-            model=config["diffexp"]["models"],
-            cons=["with_consequences", "without_consequences"],
+    if is_activated(config["diffsplice"]):
+        # diffsplice analysis
+        wanted_input.extend(
+            expand(
+                "results/plots/diffsplice/{model}/{cons}",
+                model=config["diffexp"]["models"],
+                cons=["with_consequences", "without_consequences"],
+            )
         )
-    )
 
     # interactive logcount plots
     wanted_input.extend(
