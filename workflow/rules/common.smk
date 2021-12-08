@@ -283,4 +283,11 @@ def all_input(wildcards):
         )
     )
 
+    wanted_input.extend(
+        expand(
+            "results/cluster/{model}.consensus_threshold_graph.html",
+            model=config["diffexp"]["models"],
+        )
+    )
+
     return wanted_input
