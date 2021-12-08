@@ -1,0 +1,14 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - pandas
+  - numpy >=1.21
+  - scipy
+  - scikit-learn >= 1.0.0
+  - umap-learn >= 0.5.2
+  - numba
+  - pip
+  - pip:
+    - ClusterEnsembles ==1.0.*
