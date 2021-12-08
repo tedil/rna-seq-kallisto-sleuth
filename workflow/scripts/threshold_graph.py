@@ -1,12 +1,81 @@
 from collections import defaultdict
 from itertools import product
-from typing import List, Tuple, Set, Union
+from typing import Union
 
 import numpy as np
 import pandas as pd
 import networkx as nx
 from networkx import Graph
 from plotly.graph_objects import Scatter, Figure, Layout
+
+
+def _color_by_supplement_button(supplement: pd.DataFrame):
+    if supplement is None or supplement.empty:
+        return None
+    columns = list(supplement.columns)
+    index = list(supplement.index)
+    column_types = {
+        col: "continuous"
+        if np.issubdtype(supplement[col].values.dtype, float)
+        else "categorical"
+        for col in columns
+    }
+    column_values = {
+        col: list(map(str, supplement[col].fillna("_unknown").values))
+        for col in columns
+    }
+    column_uniques = {
+        col: list(sorted(list(np.unique(column_values[col])))) for col in columns
+    }
+    column_colors = {
+        col: {unique: i for i, unique in enumerate(uniques)}
+        for col, uniques in column_uniques.items()
+    }
+
+    def get_color(i, col):
+        if column_uniques[col][i] != "_unknown":
+            if column_types[col] == "categorical":
+                return f"hsv({int(i / len(column_uniques[col]) * 360)}, 0.75, 0.66)"
+            else:
+                return f"hsv(0, 0.75, {1 - (float(column_uniques[col][i]) - np.nanmin(supplement[col].values)) / (np.nanmax(supplement[col].values) - np.nanmin(supplement[col].values))})"
+        else:
+            return "hsva(0, 0, 0.75, 0.33)"
+
+    colormap = {
+        col: {i: get_color(i, col) for i in range(len(column_uniques[col]))}
+        for col in columns
+    }
+    column_colors = {
+        col: [colormap[col][column_colors[col][v]] for v in column_values[col]]
+        for col in columns
+    }
+    return {
+        "buttons": [
+            {
+                "args": [
+                    {
+                        "marker": [{"color": column_colors[col], "size": 12}],
+                        "text": [
+                            list(
+                                map(
+                                    lambda x: f", {col}: ".join(map(str, x)),
+                                    zip(index, column_values[col]),
+                                )
+                            )
+                        ],
+                    }
+                ],
+                "label": col,
+                "method": "update",
+            }
+            for col in columns[::-1]
+            if 2 <= len(column_uniques[col]) <= len(column_values[col])
+        ],
+        "direction": "down",
+        "showactive": True,
+        "xanchor": "left",
+        "yanchor": "top",
+    }
 
 
 def _mk_networkx_figure(
@@ -92,8 +161,16 @@ def _mk_networkx_figure(
 def distance_graph(
     clusterings: pd.DataFrame, metadata: Union[None, pd.DataFrame] = None
 ):
-    # TODO use metadata for node shape + color dropdown
+
     graph = nx.Graph()
+
+    if metadata is not None:
+        # it is important we add the nodes in the order they appear in the metadata
+        # because the dropdown changing the colors and labels relies on the order
+        graph.add_nodes_from(list(metadata.index))
+    else:
+        graph.add_nodes_from(list(clusterings.columns))
+
     for i, labels in clusterings.iterrows():
         lbls = sorted(set(labels))
         for label in lbls:
@@ -230,6 +307,11 @@ def distance_graph(
         sliders=sliders,
         template="plotly_white",
     )
+
+    if metadata is not None:
+        color_button = _color_by_supplement_button(metadata)
+        fig.update_layout(updatemenus=[color_button])
+
     fig["layout"]["sliders"][0]["currentvalue"]["prefix"] = "Threshold: "
 
     return fig
@@ -241,9 +323,10 @@ clusterings = pd.read_csv(snakemake.input.clusterings, sep="\t").set_index(
     ["cluster_method", "n_clusters", "additional_params"]
 )
 
-meta_path = snakemake.params.get("metadata", None)
+meta_path = snakemake.input.get("samples", None)
 if meta_path:
     metadata = pd.read_csv(meta_path, sep="\t")
+    metadata.set_index("sample", inplace=True)
 else:
     metadata = None
 

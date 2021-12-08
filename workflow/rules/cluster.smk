@@ -3,13 +3,12 @@ rule threshold_graph:
     input:
         consensus="results/cluster/{model}.consensus_clusters.tsv",
         clusterings="results/cluster/{model}.cluster_labels.tsv",
+        samples="results/sleuth/samples.tsv",
     output:
         plot=report(
             "results/cluster/{model}.consensus_threshold_graph.html",
             category="Cluster",
         ),
-    # params:
-    #    metadata="",
     conda:
         "../envs/clusters.yml"
     script:
