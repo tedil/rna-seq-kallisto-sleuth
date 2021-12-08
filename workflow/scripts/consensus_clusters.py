@@ -1,11 +1,13 @@
-from itertools import product
-from typing import Tuple, Any, List
-
-import pandas as pd
-import numpy as np
 import random
+from itertools import product
+from sys import stderr
+from typing import Any, List
+from multiprocessing import Pool
 
-from sklearn.decomposition import PCA, NMF, FastICA
+import ClusterEnsembles as CE
+import numpy as np
+import pandas as pd
+from numpy.typing import ArrayLike
 from sklearn.cluster import (
     KMeans,
     AffinityPropagation,
@@ -15,7 +17,12 @@ from sklearn.cluster import (
     MeanShift,
     FeatureAgglomeration,
 )
-from numpy.typing import ArrayLike
+from sklearn.decomposition import PCA, NMF, FastICA
+from sklearn.metrics import (
+    silhouette_score,
+    calinski_harabasz_score,
+    davies_bouldin_score,
+)
 from sklearn.preprocessing import (
     StandardScaler,
     RobustScaler,
@@ -25,15 +32,7 @@ from sklearn.preprocessing import (
     MinMaxScaler,
     MaxAbsScaler,
 )
-from sklearn.metrics import (
-    silhouette_score,
-    calinski_harabasz_score,
-    davies_bouldin_score,
-)
 from umap import UMAP
-from sys import stderr
-
-import ClusterEnsembles as CE
 
 RANDOM_STATE = snakemake.params.get("random_state", 608429167)
 random.seed(RANDOM_STATE)
@@ -209,51 +208,60 @@ def get_transformations():
     return transformations
 
 
+def do_clustering(matrix, Transform, n_components, max_n_clusters):
+    _path, matrix = matrix
+    x = matrix.values
+    samples = list(matrix.index)
+    xx = x
+    try:
+        transform = Transform(n_components=n_components)
+    except:
+        if Transform is FeatureAgglomeration:
+            # if the number of features is very high, feature agglomeration is costly (memory-wise)
+            # we're selecting the most variable features here, which is biased,
+            # perhaps consider doing multiple random subsamples instead?
+            num_selected_features = 16536
+            xx = xx[:, np.argsort(-np.std(xx, axis=0))[:num_selected_features]]
+            transform = Transform(
+                n_clusters=max(2, int(np.ceil(np.log2(num_selected_features)))),
+                memory="/tmp/consensus",
+            )
+        else:
+            transform = Transform()
+    try:
+        xx = transform.fit_transform(xx)
+        cluster_df = cluster(xx, samples, max_n_clusters=max_n_clusters)
+        # TODO: score on original data (x) or transformed data (xx)?
+        score_df = cluster_df.apply(lambda lbls: scores(xx, lbls), axis=1)
+        score_df = pd.DataFrame(
+            index=score_df.index,
+            columns=["silhouette", "calinski_harabasz", "davies_bouldin"],
+            data=score_df.tolist(),
+        )
+        return cluster_df, score_df
+    except Exception as e:
+        eprint(e)
+        return None, None
+
+
 def main():
     matrices = get_input()
 
-    results = []
     transformations = get_transformations()
     n_components_options = list(
         range(2, snakemake.params.get("dim_reduction_max_dim", 2) + 1)
     )
     max_n_clusters = snakemake.params.get("max_n_clusters", 2) + 1
 
-    options = product(*[matrices.items(), transformations, n_components_options])
-
-    for ((key, matrix), Transform, n_components) in options:
-        x = matrix.values
-        features = list(matrix.columns)
-        samples = list(matrix.index)
-        xx = x
-        try:
-            transform = Transform(n_components=n_components)
-        except:
-            if Transform is FeatureAgglomeration:
-                # if the number of features is very high, feature agglomeration is costly (memory-wise)
-                # we're selecting the most variable features here, which is biased,
-                # perhaps consider doing multiple random subsamples instead?
-                num_selected_features = 16536
-                xx = xx[:, np.argsort(-np.std(xx, axis=0))[:num_selected_features]]
-                transform = Transform(
-                    n_clusters=max(2, int(np.ceil(np.log2(num_selected_features)))),
-                    memory="/tmp/consensus",
-                )
-            else:
-                transform = Transform()
-        try:
-            xx = transform.fit_transform(xx)
-            cluster_df = cluster(xx, samples, max_n_clusters=max_n_clusters)
-            # TODO: score on original data (x) or transformed data (xx)?
-            score_df = cluster_df.apply(lambda lbls: scores(xx, lbls), axis=1)
-            score_df = pd.DataFrame(
-                index=score_df.index,
-                columns=["silhouette", "calinski_harabasz", "davies_bouldin"],
-                data=score_df.tolist(),
-            )
-            results.append((cluster_df, score_df))
-        except Exception as e:
-            eprint(e)
+    options = product(
+        matrices.items(), transformations, n_components_options, [max_n_clusters]
+    )
+    with Pool(snakemake.threads) as pool:
+        results = [
+            (a, b)
+            for a, b in pool.starmap(do_clustering, options)
+            if a is not None and b is not None
+        ]
 
     all_clusters, all_scores = zip(*results)
     all_clusters = pd.concat(all_clusters)

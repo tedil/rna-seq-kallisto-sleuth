@@ -22,6 +22,7 @@ rule consensus_clusters:
     output:
         clusters="results/cluster/{model}.consensus_clusters.tsv",
         labels="results/cluster/{model}.cluster_labels.tsv",
+    threads: 24
     params:
         # for algorithms that support it, generate clusterings with n_clusters in range(2, max_n_clusters + 1)
         max_n_clusters=5,
