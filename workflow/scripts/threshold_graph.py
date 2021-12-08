@@ -237,8 +237,15 @@ def distance_graph(
 
 # generate_plots()
 
-fig = distance_graph(
-    snakemake.input.clusterings, snakemake.params.get("metadata", None)
+clusterings = pd.read_csv(snakemake.input.clusterings, sep="\t").set_index(
+    ["cluster_method", "n_clusters", "additional_params"]
 )
+
+meta_path = snakemake.params.get("metadata", None)
+if meta_path:
+    metadata = pd.read_csv(meta_path, sep="\t")
+else:
+    metadata = None
+
+fig = distance_graph(clusterings, metadata)
 fig.write_html(snakemake.output.plot)
-fig.show()
