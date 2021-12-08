@@ -69,7 +69,7 @@ def _color_by_supplement_button(supplement: pd.DataFrame):
                 "method": "update",
             }
             for col in columns[::-1]
-            if 2 <= len(column_uniques[col]) <= len(column_values[col])
+            if 2 <= len(column_uniques[col]) < len(column_values[col])
         ],
         "direction": "down",
         "showactive": True,
