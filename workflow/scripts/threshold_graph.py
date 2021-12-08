@@ -246,24 +246,6 @@ def distance_graph(
         ),
     )
 
-    fig.add_annotation(
-        text=f"Nodes: Samples<br>"
-        f"Edge from A to B: A and B have clustered together<br>"
-        f"Edge weight (width): fraction of times A and B clustered together in all {len(clusterings.index)} clusterings<br>"
-        f"Color: Largest clique sample is a member of<br>"
-        f"Threshold: Edges with weight < threshold are removed",
-        align="left",
-        showarrow=False,
-        xref="paper",
-        yref="paper",
-        x=0.9,
-        y=0.01,
-        font=dict(size=14),
-        bgcolor="rgba(0, 0, 0, 0.1)",
-        bordercolor="black",
-        borderwidth=0,
-    )
-
     step_sizes = [0]
     for threshold, subfig in zip(thresholds, figures):
         *edge_traces, node_trace = subfig.data
